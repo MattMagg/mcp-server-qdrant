@@ -5,17 +5,24 @@ WORKDIR /app
 # Install uv for package management
 RUN pip install --no-cache-dir uv
 
-# Install the mcp-server-qdrant package
-RUN uv pip install --system --no-cache-dir mcp-server-qdrant
+# Copy local source code with optimal search modifications
+COPY pyproject.toml README.md ./
+COPY src/ ./src/
 
-# Expose the default port for SSE transport
+# Install from local source with all dependencies (voyageai, sentence-transformers, etc.)
+RUN uv pip install --system --no-cache-dir .
+
+# Expose the default port for HTTP transport
 EXPOSE 8000
 
 # Set environment variables with defaults that can be overridden at runtime
+ENV FASTMCP_HOST="0.0.0.0"
+ENV FASTMCP_PORT="8000"
 ENV QDRANT_URL=""
 ENV QDRANT_API_KEY=""
-ENV COLLECTION_NAME="default-collection"
-ENV EMBEDDING_MODEL="sentence-transformers/all-MiniLM-L6-v2"
+ENV COLLECTION_NAME="light-on-yoga"
+ENV VOYAGE_API_KEY=""
+ENV TOKENIZERS_PARALLELISM="true"
 
-# Run the server with SSE transport
-CMD uvx mcp-server-qdrant --transport sse
+# Run the server with streamable HTTP transport
+CMD ["python", "-m", "mcp_server_qdrant.main", "--transport", "streamable-http"]

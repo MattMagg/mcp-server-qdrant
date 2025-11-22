@@ -1,0 +1,29 @@
+{
+  "permissions": {"defaultMode": "bypassPermissions"},
+  "enableAllProjectMcpServers": true,
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/repo-engineer-inject-context.sh",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit|Task",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/repo-engineer-posttool-selfcheck.py",
+            "timeout": 5
+          }
+        ]
+      }
+    ]
+  }
+}

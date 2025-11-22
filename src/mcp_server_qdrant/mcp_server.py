@@ -72,6 +72,11 @@ class QdrantMCPServer(FastMCP):
             self.embedding_provider,
             qdrant_settings.local_path,
             make_indexes(qdrant_settings.filterable_fields_dict()),
+            voyage_api_key=self.embedding_provider_settings.voyage_api_key if self.embedding_provider_settings else None,
+            use_multi_query=qdrant_settings.use_multi_query,
+            use_reranking=qdrant_settings.use_reranking,
+            first_stage_k=qdrant_settings.first_stage_k,
+            hnsw_ef=qdrant_settings.hnsw_ef,
         )
 
         super().__init__(name=name, instructions=instructions, **settings)

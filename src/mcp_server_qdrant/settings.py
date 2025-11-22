@@ -46,6 +46,10 @@ class EmbeddingProviderSettings(BaseSettings):
         default="sentence-transformers/all-MiniLM-L6-v2",
         validation_alias="EMBEDDING_MODEL",
     )
+    voyage_api_key: str | None = Field(
+        default=None,
+        validation_alias="VOYAGE_API_KEY",
+    )
 
 
 class FilterableField(BaseModel):
@@ -84,6 +88,12 @@ class QdrantSettings(BaseSettings):
     local_path: str | None = Field(default=None, validation_alias="QDRANT_LOCAL_PATH")
     search_limit: int = Field(default=10, validation_alias="QDRANT_SEARCH_LIMIT")
     read_only: bool = Field(default=False, validation_alias="QDRANT_READ_ONLY")
+
+    # Optimal search settings
+    use_multi_query: bool = Field(default=True, validation_alias="QDRANT_MULTI_QUERY")
+    use_reranking: bool = Field(default=True, validation_alias="QDRANT_RERANKING")
+    first_stage_k: int = Field(default=50, validation_alias="QDRANT_FIRST_STAGE_K")
+    hnsw_ef: int = Field(default=128, validation_alias="QDRANT_HNSW_EF")
 
     filterable_fields: list[FilterableField] | None = Field(default=None)
 
