@@ -4,9 +4,11 @@ from mcp_server_qdrant.settings import (
     QdrantSettings,
     ToolSettings,
 )
+from mcp_server_qdrant.auth_middleware import BearerAuthMiddleware
 
 mcp = QdrantMCPServer(
     tool_settings=ToolSettings(),
     qdrant_settings=QdrantSettings(),
     embedding_provider_settings=EmbeddingProviderSettings(),
+    middleware=[BearerAuthMiddleware]
 )

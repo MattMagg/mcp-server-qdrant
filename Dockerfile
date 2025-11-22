@@ -23,6 +23,7 @@ ENV QDRANT_API_KEY=""
 ENV COLLECTION_NAME="light-on-yoga"
 ENV VOYAGE_API_KEY=""
 ENV TOKENIZERS_PARALLELISM="true"
+ENV MCP_AUTH_TOKEN=""
 
 # Run the server with streamable HTTP transport
 CMD ["python", "-m", "mcp_server_qdrant.main", "--transport", "streamable-http"]
