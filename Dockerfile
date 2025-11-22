@@ -10,6 +10,8 @@ COPY pyproject.toml README.md ./
 COPY src/ ./src/
 
 # Install from local source with all dependencies (voyageai, sentence-transformers, etc.)
+# Increase timeout for large ML packages (torch 99MB, scipy 32MB, onnxruntime 14MB)
+ENV UV_HTTP_TIMEOUT=600
 RUN uv pip install --system --no-cache-dir .
 
 # Expose the default port for HTTP transport
