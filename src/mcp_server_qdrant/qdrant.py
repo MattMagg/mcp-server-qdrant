@@ -88,10 +88,17 @@ class QdrantConnector:
         # Initialize optimal search clients
         self._voyage_client = None
         self._sparse_encoder = None
+        self._sparse_encoder_initialized = False
         if VOYAGEAI_AVAILABLE and voyage_api_key:
             self._voyage_client = voyageai.Client(api_key=voyage_api_key)
-        if SPARSE_ENCODER_AVAILABLE:
+
+    def _ensure_sparse_encoder(self):
+        """Lazy-load SPLADE encoder on first use to avoid blocking startup."""
+        if not self._sparse_encoder_initialized and SPARSE_ENCODER_AVAILABLE:
+            logger.info("Loading SPLADE encoder (first use)...")
             self._sparse_encoder = SparseEncoder("naver/splade-cocondenser-ensembledistil", device="cpu")
+            self._sparse_encoder_initialized = True
+            logger.info("SPLADE encoder loaded successfully")
 
     def _generate_query_variations(self, query: str, num_variations: int = 3) -> list[str]:
         """Generate multiple query perspectives for multi-query expansion."""
@@ -135,8 +142,9 @@ class QdrantConnector:
 
     def _embed_query_sparse(self, query: str) -> dict[str, list]:
         """Embed query with SPLADE (sparse vector)."""
+        self._ensure_sparse_encoder()
         if not self._sparse_encoder:
-            raise ValueError("Sparse encoder not initialized")
+            raise ValueError("Sparse encoder not available")
 
         sparse_embeds = self._sparse_encoder.encode_document([query])
         sparse_vec = sparse_embeds[0].coalesce()
@@ -191,7 +199,7 @@ class QdrantConnector:
         payload = {"document": entry.content, METADATA_PATH: entry.metadata}
 
         # Check if we should use hybrid embedding
-        use_hybrid = (self._voyage_client is not None and self._sparse_encoder is not None)
+        use_hybrid = (self._voyage_client is not None and SPARSE_ENCODER_AVAILABLE)
 
         if use_hybrid:
             # Embed with VoyageAI (dense) and SPLADE (sparse)
